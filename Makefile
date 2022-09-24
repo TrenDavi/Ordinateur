@@ -1,10 +1,10 @@
 AS = ca65
-ASFLAGS = --cpu 65sc02
+ASFLAGS = --cpu 65c02
 CC = cc65
 # Instruct cc65 to not make any assumptions about the target system (-t none)
 # and specify the cc65 toolset processor 65SC02 (supports 65C02 extensions
 # without bit manipulation instructions)
-CFLAGS = -t none --cpu 65sc02
+CFLAGS = -t none --cpu 65c02
 
 # Specify the sbc.cfg linker config file (-C) and create a memory map file (-m)
 all: crt0.o main.o interrupt.o vectors.o wait.o
