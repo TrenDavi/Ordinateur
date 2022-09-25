@@ -22,7 +22,6 @@ crt0.o:
 	cp supervision.lib build/sbc.lib
 	$(AS) crt0.s -o build/crt0.o
 	ar65 a build/sbc.lib build/crt0.o
-	echo "crt0.o"
 
 # Have every C *.c file be compiled and assembled by an implicit rule
 %.o: %.c

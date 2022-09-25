@@ -1,20 +1,12 @@
-.import   _stop ; Import knowledge of the _stop symbol, used to signal a
-                ; software fault.
-.export   _irq_int, _nmi_int  ; Allow the _irq_int and _nmi_int symbols to be
-                              ; placed in the vector table (interrupt section).
+.import   _stop
+.export   _irq_int, _nmi_int
 
-.segment  "CODE" ; Force placement into the CODE memory section.
+.segment  "CODE"
 
-.PC02                             ; Force ca65 to use the 65C02 assembly mode
+.PC02
 
-_nmi_int:  STA $8000  		  ; Read Keyboard Buf into A
-  	   
-	   LDA $8000		  ; Reset Keyboard Buf Counter
-	   RTI                    ; Return
+_nmi_int:  RTI
 
-_irq_int:  RTI			  ; Not in use
+_irq_int:  RTI
 
-; BRK detected, stop
-
-break:     JMP _stop              ; If BRK is detected, something very bad
-                                  ;   has happened, so stop running
+break:     JMP _stop
