@@ -3,6 +3,10 @@ PORTA = $8001
 DDRB = $8002
 DDRA = $8003
 
+PCR = $600C
+IFR = $600D
+IER = $600E
+
 E  = %10000000
 RW = %01000000
 RS = %00100000
@@ -54,6 +58,13 @@ _init:    LDX     #$FF
 
           lda #$00000001 ; Clear display
           jsr lcd_instruction
+
+; Initialize interrups
+         LDA #%00000001
+         STA PCR
+         LDA #%10000010
+         STA IER
+         CLI
 
 ; Call main()
           JSR     _main

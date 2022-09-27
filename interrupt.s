@@ -5,8 +5,11 @@
 
 .PC02
 
-_nmi_int:  RTI
+_nmi_int:  
+           RTI
 
-_irq_int:  RTI
+_irq_int:  
+           CLI
+           RTI
 
 break:     JMP _stop
