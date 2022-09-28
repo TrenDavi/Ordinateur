@@ -41,23 +41,27 @@ _init:    LDX     #$FF
           JSR     initlib              ; Run constructors
 
 ; Initialize screen
-          lda #%11111111 ; Set all pins on port B to output
-          sta DDRB
-          lda #%11100000 ; Set top 3 pins on port A to output
-          sta DDRA
+          LDA #%11111111
+          STA DDRB
+          LDA #%11100000
+          STA DDRA
   
 
-          lda #%00111000 ; Set 8-bit mode; 2-line display; 5x8 font
-          jsr lcd_instruction
+          ; Enable 8-bit mode, 2-line display, 5x8 font
+          LDA #%00111000
+          JSR lcd_instruction
 
-          lda #%00001111 ; Display on; cursor on; blink off
-          jsr lcd_instruction
+          ; Turn display on, cursor on, blink off
+          LDA #%00001111
+          JSR lcd_instruction
 
-          lda #%00000110 ; Increment and shift cursor; don't shift display
-          jsr lcd_instruction
+          ; Increment and shift cursor, don't shift display
+          LDA #%00000110
+          JSR lcd_instruction
 
-          lda #$00000001 ; Clear display
-          jsr lcd_instruction
+          ; Clear display
+          LDA #$00000001
+          JSR lcd_instruction
 
 ; Initialize interrups
          LDA #%00000001
