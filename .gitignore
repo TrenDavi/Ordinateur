@@ -1,3 +1,10 @@
-build
+Ordinateur
+
+*.o
+main.c.s
+
+main.map
+sbc.lib
+
 
 *.swp
