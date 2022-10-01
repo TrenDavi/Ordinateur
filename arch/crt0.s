@@ -76,9 +76,6 @@ init:
 
           JSR kinit
 
-
-loop:
-        jmp loop
 exit:    
           JSR donelib ; Run destructors
           BRK
