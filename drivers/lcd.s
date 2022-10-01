@@ -15,10 +15,10 @@
 .export RW
 .export RS
 
-PORTB = $8000
-PORTA = $8001
-DDRB = $8002
-DDRA = $8003
+PORTB = $6000
+PORTA = $6001
+DDRB = $6002
+DDRA = $6003
 
 PCR = $600C
 IFR = $600D
