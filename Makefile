@@ -5,9 +5,10 @@ CFLAGS = -t none --cpu 65c02
 
 files_o =         \
     crt0.o        \
-    interrupt.o   \
-    vectors.o     \
-    wait.o
+    arch/interrupt.o   \
+    arch/vectors.o     \
+    arch/wait.o        \
+    kernel/kernel.o
     
 all: $(files_o)
 	ld65 -C arch/sbc.cfg $^ sbc.lib -o Ordinateur
@@ -17,20 +18,11 @@ crt0.o:
 	$(AS) arch/crt0.s -o crt0.o
 	ar65 a sbc.lib crt0.o
 
-# Have every C *.c file be compiled and assembled by an implicit rule
-%.o: %.c
-	$(CC) $(CFLAGS) $^ -o $^.s
-	$(AS) $(ASFLAGS) $^.s -o $@
-
 # Have every assembly *.s file be assembled by an implicit rule
-%.o: arch/%.s
+%.o: kernel/%.s arch/%.s
 	$(AS) $(ASFLAGS) $^ -o $@
 
 .PHONY: clean
 clean:
-	rm -rf sbc.lib *.s *.o
-
-.PHONY: cleanall
-cleanall:
-	rm -rf sbc.lib *.s *.o Ordinateur
+	rm -rf sbc.lib *.s *.o **/*.o Ordinateur
 
