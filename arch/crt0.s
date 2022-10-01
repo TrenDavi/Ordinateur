@@ -11,8 +11,7 @@ E  = %10000000
 RW = %01000000
 RS = %00100000
 
-.export   _init, _exit
-.import   _main
+.export   init, exit
 
 .export   __STARTUP__ : absolute = 1
 
@@ -25,7 +24,8 @@ RS = %00100000
 
 .segment  "STARTUP"
 
-_init:    LDX     #$FF
+init:    
+          LDX     #$FF
           TXS
           CLD
 
@@ -64,54 +64,55 @@ _init:    LDX     #$FF
           JSR lcd_instruction
 
 ; Initialize interrups
-         LDA #%00000001
-         STA PCR
-         LDA #%10000010
-         STA IER
-         CLI
+          LDA #%00000001
+          STA PCR
+          LDA #%10000010
+          STA IER
+          CLI
 
-_exit:    JSR     donelib ; Run destructors
+exit:    
+          JSR     donelib ; Run destructors
           BRK
 
 
 lcd_wait:
-          pha
-          lda #%00000000  ; Port B is input
-          sta DDRB
+          PHA
+          LDA #%00000000  ; Port B is input
+          STA DDRB
 
 lcdbusy:
-          lda #RW
-          sta PORTA
-          lda #(RW | E)
-          sta PORTA
-          lda PORTB
-          and #%10000000
-          bne lcdbusy
-          lda #RW
-          sta PORTA
-          lda #%11111111  ; Port B is output
-          sta DDRB
-          pla
-          rts
+          LDA #RW
+          STA PORTA
+          LDA #(RW | E)
+          STA PORTA
+          LDA PORTB
+          AND #%10000000
+          BNE lcdbusy
+          LDA #RW
+          STA PORTA
+          LDA #%11111111  ; Port B is output
+          STA DDRB
+          PLA
+          RTS
 
 lcd_instruction:
-          jsr lcd_wait
-          sta PORTB
-          lda #0         ; Clear RS/RW/E bits
-          sta PORTA
-          lda #E         ; Set E bit to send instruction
-          sta PORTA
-          lda #0         ; Clear RS/RW/E bits
-          sta PORTA
-          rts
+          JSR lcd_wait
+          STA PORTB
+          LDA #0         ; Clear RS/RW/E bits
+          STA PORTA
+          LDA #E         ; Set E bit to send instruction
+          STA PORTA
+          LDA #0         ; Clear RS/RW/E bits
+          STA PORTA
+          RTS
 
 put_c:
-          jsr lcd_wait
-          sta PORTB
-          lda #RS         ; Set RS; Clear RW/E bits
-          sta PORTA
-          lda #(RS | E)   ; Set E bit to send instruction
-          sta PORTA
-          lda #RS         ; Clear E bits
-          sta PORTA
-          rts
+          JSR lcd_wait
+          STA PORTB
+          LDA #RS         ; Set RS; Clear RW/E bits
+          STA PORTA
+          LDA #(RS | E)   ; Set E bit to send instruction
+          STA PORTA
+          LDA #RS         ; Clear E bits
+          STA PORTA
+          RTS
