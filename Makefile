@@ -29,8 +29,9 @@ crt0.o:
 
 .PHONY: clean
 clean:
-	rm -rf **/*.o **/*.map
+	rm -rf sbc.lib *.s *.o *.map
 
 .PHONY: cleanall
 cleanall:
-	rm -rf **/*.o **/*.map Ordinateur
+	rm -rf sbc.lib *.s *.o *.map Ordinateur
+
