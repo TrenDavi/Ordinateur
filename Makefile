@@ -4,14 +4,13 @@ CC = cc65
 CFLAGS = -t none --cpu 65c02
 
 files_o =         \
-    main.o        \
     crt0.o        \
     interrupt.o   \
     vectors.o     \
     wait.o
     
 all: $(files_o)
-	ld65 -C arch/sbc.cfg -m main.map $^ sbc.lib -o Ordinateur
+	ld65 -C arch/sbc.cfg $^ sbc.lib -o Ordinateur
 
 crt0.o:
 	cp lib/supervision.lib sbc.lib
@@ -29,9 +28,9 @@ crt0.o:
 
 .PHONY: clean
 clean:
-	rm -rf sbc.lib *.s *.o *.map
+	rm -rf sbc.lib *.s *.o
 
 .PHONY: cleanall
 cleanall:
-	rm -rf sbc.lib *.s *.o *.map Ordinateur
+	rm -rf sbc.lib *.s *.o Ordinateur
 

@@ -70,9 +70,6 @@ _init:    LDX     #$FF
          STA IER
          CLI
 
-; Call main()
-          JSR     _main
-
 _exit:    JSR     donelib ; Run destructors
           BRK
 
@@ -108,7 +105,7 @@ lcd_instruction:
           sta PORTA
           rts
 
-put_char:
+put_c:
           jsr lcd_wait
           sta PORTB
           lda #RS         ; Set RS; Clear RW/E bits
