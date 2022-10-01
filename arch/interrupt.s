@@ -1,15 +1,26 @@
 .import   _stop
 .export   _irq_int, _nmi_int
 
+.import put_c
+.import SR
+.import PORTB
+
 .segment  "CODE"
 
 .PC02
 
 _nmi_int:  
-           RTI
+          RTI
 
 _irq_int:  
-           CLI
-           RTI
+          PHA
+          LDA SR
+          LDA PORTB
+          JSR put_c
 
-break:     JMP _stop
+          PLA
+          CLI
+          RTI
+
+break:     
+          JMP _stop

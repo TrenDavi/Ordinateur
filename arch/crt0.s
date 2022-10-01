@@ -11,6 +11,8 @@
 .import DDRB
 .import DDRA
 
+.import SR
+.import ACR
 .import PCR
 .import IFR
 .import IER
@@ -68,12 +70,18 @@ init:
           JSR lcd_instruction
 
 ; Initialize interrups
-          LDA #%00000001
+          ; Set negative edge to shift into the 65c02
+          LDA #%00010000
           STA PCR
-          LDA #%10000010
+          ; Set to interrupt after 8bits are shifted in
+          LDA #%00001100
+          STA ACR
+          ; Enable set and interrupt
+          LDA #%10000100
           STA IER
+          ; Set shift register to shift on CB2 with CB1 as input
+          STA SR
           CLI
-
           JSR kinit
 
 exit:    

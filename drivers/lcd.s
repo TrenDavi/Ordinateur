@@ -2,11 +2,15 @@
 .export lcd_busy
 .export lcd_instruction
 
+.export put_c
+
 .export PORTB
 .export PORTA
 .export DDRB
 .export DDRA
 
+.export SR
+.export ACR
 .export PCR
 .export IFR
 .export IER
@@ -20,6 +24,8 @@ PORTA = $6001
 DDRB = $6002
 DDRA = $6003
 
+SR  = $600A
+ACR = $600B
 PCR = $600C
 IFR = $600D
 IER = $600E
@@ -68,4 +74,3 @@ put_c:
           STA PORTA
           LDA #RS         ; Clear E bits
           STA PORTA
-          RTS
