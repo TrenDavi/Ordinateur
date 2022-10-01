@@ -1,4 +1,11 @@
 .export kinit
 
 kinit:
-          JMP kinit
+          JSR kernel
+          JMP hang
+
+kernel:
+          RTS
+
+hang:
+          JMP hang
