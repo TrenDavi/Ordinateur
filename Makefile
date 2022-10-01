@@ -8,7 +8,8 @@ files_o =         \
     arch/interrupt.o   \
     arch/vectors.o     \
     arch/wait.o        \
-    kernel/kernel.o
+    kernel/kernel.o    \
+    drivers/lcd.o      \
     
 all: $(files_o)
 	ld65 -C arch/sbc.cfg $^ sbc.lib -o Ordinateur
