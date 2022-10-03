@@ -80,6 +80,7 @@ init:
           LDA #%10000100
           STA IER
           ; Set shift register to shift on CB2 with CB1 as input
+          LDA #%00001100
           STA SR
           CLI
           JSR kinit

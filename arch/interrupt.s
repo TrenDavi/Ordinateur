@@ -15,7 +15,8 @@ _nmi_int:
 _irq_int:  
           PHA
           LDA SR
-          LDA PORTB
+          JSR put_c
+          LDA #' '
           JSR put_c
 
           PLA
