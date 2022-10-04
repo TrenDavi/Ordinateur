@@ -2,6 +2,7 @@
 .export   _irq_int, _nmi_int
 
 .import put_c
+.import lcd_instruction
 .import SR
 .import PORTB
 
@@ -14,6 +15,8 @@ _nmi_int:
 
 _irq_int:  
           PHA
+          LDA #%00000001
+          JSR lcd_instruction
           LDA SR
           JSR put_c
           LDA #' '
