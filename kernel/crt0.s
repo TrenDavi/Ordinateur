@@ -70,18 +70,13 @@ init:
           JSR lcd_instruction
 
 ; Initialize interrups
-          ; Set negative edge to shift into the 65c02
-          LDA #%00010000
+          ; Set negative edge to trigger interrupt and CB2 to input
+          LDA #%00000000
           STA PCR
-          ; Set to interrupt after 8bits are shifted in
-          LDA #%00001100
-          STA ACR
-          ; Enable set and interrupt
-          LDA #%10000100
+          ; Enable interrupts on CB1
+          LDA #%10010000
           STA IER
-          ; Set shift register to shift on CB2 with CB1 as input
-          LDA #%00001100
-          STA SR
+
           CLI
           JSR kinit
 
