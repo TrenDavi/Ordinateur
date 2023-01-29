@@ -9,10 +9,10 @@ files_o =         \
     kernel/vectors.o     \
     kernel/wait.o        \
     kernel/kernel.o    \
-    drivers/lcd.o      \
+    kernel/lcd.o      \
     
 all: $(files_o)
-	ld65 -C kernel/sbc.cfg $^ sbc.lib -o Ordinateur
+	ld65 -C sbc.cfg $^ sbc.lib -o Ordinateur
 
 crt0.o:
 	cp lib/supervision.lib sbc.lib
