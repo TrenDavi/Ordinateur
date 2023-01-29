@@ -69,14 +69,6 @@ init:
           LDA #$00000001
           JSR lcd_instruction
 
-; Initialize interrups
-          ; Set negative edge to trigger interrupt and CB2 to input
-          LDA #%00000000
-          STA PCR
-          ; Enable interrupts on CB1
-          LDA #%10010000
-          STA IER
-
           CLI
           JSR kinit
 
