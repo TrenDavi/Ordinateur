@@ -16,6 +16,12 @@ datan: .byte 0
 
 .PC02
 
+_irq_int:
+      	RTI
+
+break:
+      	JMP _stop
+
 _nmi_int:
       	PHA
         PHX
@@ -68,12 +74,6 @@ reset_c:
         JSR put_c
 
         JMP end
-    
-_irq_int:
-      	RTI
-
-break:
-      	JMP _stop
 
 .segment "RODATA"
 

@@ -5,7 +5,7 @@ CFLAGS = -t none --cpu 65c02
 
 files_o =         \
     crt0.o        \
-    kernel/interrupt.o   \
+    kernel/keyboard.o   \
     kernel/vectors.o     \
     kernel/wait.o        \
     kernel/kernel.o    \
