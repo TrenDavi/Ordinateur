@@ -4,31 +4,20 @@
 
 .export put_c
 
-.export PORTB
-.export PORTA
-.export DDRB
-.export DDRA
+.import PORTB
+.import PORTA
+.import DDRB
+.import DDRA
 
-.export SR
-.export ACR
-.export PCR
-.export IFR
-.export IER
+.import SR
+.import ACR
+.import PCR
+.import IFR
+.import IER
 
 .export E
 .export RW
 .export RS
-
-PORTB = $6000
-PORTA = $6001
-DDRB = $6002
-DDRA = $6003
-
-SR  = $600A
-ACR = $600B
-PCR = $600C
-IFR = $600D
-IER = $600E
 
 E  = %10000000
 RW = %01000000

@@ -1,9 +1,31 @@
 .import   _stop
 .export   _irq_int, _nmi_int
 
+.export PORTB
+.export PORTA
+.export DDRB
+.export DDRA
+
+.export SR
+.export ACR
+.export PCR
+.export IFR
+.export IER
+
+PORTB = $6000
+PORTA = $6001
+DDRB = $6002
+DDRA = $6003
+
+SR  = $600A
+ACR = $600B
+PCR = $600C
+IFR = $600D
+IER = $600E
+
 .import put_c
-.import PORTA
 .import lcd_instruction
+
 
 .segment  "CODE"
 
