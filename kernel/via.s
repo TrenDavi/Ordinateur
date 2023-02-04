@@ -5,13 +5,6 @@
 .import PORTA
 .import lcd_instruction
 
-.segment "DATA"
-
-ps2c: .byte 0
-ps2cp: .byte 0
-data: .byte 0
-datan: .byte 0
-
 .segment  "CODE"
 
 .PC02
@@ -22,63 +15,120 @@ _irq_int:
 break:
       	JMP _stop
 
+; PS/2 Driver
+
+; Given PS2 keycodes shift in backwards and in order to
+; save some computation, all codes are fliped MSB to LSB
+; accordingly, 10011010 = 01011001
+;
+; Load one bit in at a time. Once eight have been shifted in,
+; check if it's a release code or a character code.
+; If it is a release code: wait for the next code. If it isn't,
+; print the character to the screen
+
+.segment "DATA"
+
+; Counter where we are in the input
+SHIFT_COUNTER: .byte 0
+; Storage for the bits being shifted in
+DATA: .byte 0
+; If true, the last byte was a release code
+RELEASE_FLAG: .byte 0
+
 _nmi_int:
       	PHA
         PHX
 
-        INC ps2c
-        INC ps2cp
-        LDA ps2c
-        
-        CMP #1
-        BEQ end
-        CMP #10
-        BEQ end
-        CMP #11
-        BEQ reset
-
-        LDA ps2cp
-        CMP #11
-        BCC main
-        JMP end
-main:
+        ; Read in the data from bit 0 of PORTA on the 65C22 VIA
+        ; load it to NEW_BIT
         LDA PORTA
         AND #%00000001
-        STA datan
+        TAX
 
-        LDA data
+        ; The data bits are from SHIFT_COUNTER 1-9. 0 is the start bit,
+        ; 10 is parity, and 11 is the final stop bit. We will be ignoring
+        ; any other bit rather than data 1-8 bits
+        LDA SHIFT_COUNTER
+        CMP #0
+        BEQ skip_input
+        CMP #9
+        BEQ skip_input
+        CMP #10
+        BEQ read
+
+        ; Load DATA into A, Shift it Left one, then OR it with the NEW_BIT
+        ; Lastly, store it back to the data holder
+        LDA DATA
         ASL
-        ORA datan
-        STA data
+        CPX #1
+        BNE no_or
+        ORA #1 
+no_or:
+        STA DATA
+skip_input:
 
-end:
-        LDA ps2cp
-        CMP #33
-        BEQ reset_c
+        ; Increments the shift counter then RTIs
+        JMP inc_exit
 
-      	PLA
-        PLX
-      	RTI
+read:
+        ; Check if it's a release code or a character code. If it's a
+        ; release code, set the release next flag that indicated the next
+        ; code shows which key has been released.
 
-reset:
+        ; Since all bits have now been shifted in, reset the shift counter
         LDA #0
-        STA ps2c
-        JMP end
+        STA SHIFT_COUNTER
 
-reset_c:
-        LDA #0
-        STA ps2cp
+        ; First check if the release flag has been set. This would mean the
+        ; last code to be read in was a 0xF0 byte signifing a release code
+        ; coming next
+        LDA RELEASE_FLAG
+        CMP #1
+        BEQ read_release
+        
+        LDA DATA
+        CMP #%00001111 ; 0xF0 as 0x0F
+        BEQ release
 
-        LDX data
-        LDA keymap, X
+keypress:
+        LDX DATA
+        LDA keymap_lower, X
         JSR put_c
 
-        JMP end
+        JMP exit_nmi
+
+release:
+        ; Set the release flag, indicating that the next byte to be read in
+        ; is a release code
+        LDA #1
+        STA RELEASE_FLAG
+        JMP exit_nmi
+                
+read_release:
+        ; Reset the release flag
+        LDA #0
+        STA RELEASE_FLAG
+
+        ; Load the code into A
+        LDA DATA
+        JMP exit_nmi
+        
+inc_exit:
+        ; Since a new bit is being shifted in, increment the counter
+        INC SHIFT_COUNTER
+        JMP exit_nmi
+
+exit_nmi:
+	PLA
+        PLX
+        RTI
+
 
 .segment "RODATA"
 
-keymap:
-  .byte "???????????????"
+; Keymap, no shift
+keymap_lower:
+  .byte "x??????????????"
   .byte "???????????????"
   .byte "????o?e?????[?g"
   .byte "?????;?t???a???"
