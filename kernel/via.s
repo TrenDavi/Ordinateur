@@ -117,6 +117,10 @@ keypress:
         LDA keymap_lower, X
         JSR put_c
 
+        LDX DATA
+        LDA keymap_lower, X
+        STA SR
+
         JMP exit_nmi
 
 release:

@@ -66,8 +66,15 @@ init:
           JSR lcd_instruction
 
           ; Clear display
-          LDA #$00000001
+          LDA #%00000001
           JSR lcd_instruction
+
+; Set and Clear shift register at SR 0x6000
+          LDA #%00011000
+          STA ACR
+
+          LDA #%11111111
+          STA SR
 
           CLI
           JSR kinit
