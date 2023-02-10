@@ -1,5 +1,7 @@
-.import   _stop
-.export   _irq_int, _nmi_int
+.import _stop
+.import init
+.import back_and_space
+.export _irq_int, _nmi_int
 
 .export PORTB
 .export PORTA
@@ -107,18 +109,33 @@ read:
         LDA RELEASE_FLAG
         CMP #1
         BEQ read_release
-        
+
+        ; Check if the code is a special code / function outside of printing
+        ; a character to the screen. This includes checking if the code is a
+        ; release code or the escape key.
+
+        ; Load the final 8 bit code
         LDA DATA
+        
+        ; Compare for release code. If so: set the release code flag
         CMP #%00001111 ; 0xF0 as 0x0F
         BEQ release
+
+        ; Compare for escape. If so: reset the processor
+        CMP #%01101110
+	BEQ reset_cpu
+
+	; Compare for backspace. If so: branch to the shift back and
+        ; insert empty space sub routine
+        CMP #%01100110
+	BEQ backspace
 
 keypress:
         LDX DATA
         LDA keymap_lower, X
         JSR put_c
 
-        LDX DATA
-        LDA keymap_lower, X
+        LDA DATA
         STA SR
 
         JMP exit_nmi
@@ -149,6 +166,13 @@ exit_nmi:
         PLX
         RTI
 
+reset_cpu:
+	JMP init
+
+backspace:
+	JSR back_and_space
+	JMP exit_nmi
+
 
 .segment "RODATA"
 
@@ -157,7 +181,7 @@ keymap_lower:
   .byte "x??????????????"
   .byte "???????????????"
   .byte "????o?e?????[?g"
-  .byte "?????;?t???a???"
+  .byte "?????;?t??Xa???"
   .byte "u?????k?x?????'"
   .byte "?b?????/?v???z?"
   .byte "??m?????9?3???1"
