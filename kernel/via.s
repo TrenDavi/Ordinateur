@@ -58,6 +58,8 @@ SHIFT_COUNTER: .byte 0
 DATA: .byte 0
 ; If true, the last byte was a release code
 RELEASE_FLAG: .byte 0
+; Counts how many chars have been printed
+SCREEN_CHARS: .byte 0
 
 _nmi_int:
       	PHA
@@ -131,12 +133,17 @@ read:
 	BEQ backspace
 
 keypress:
+	; Put the indexed code to the screen
         LDX DATA
         LDA keymap_lower, X
         JSR put_c
 
+	; Put the scan code onto the LED shift register display
         LDA DATA
         STA SR
+
+	; Increment the number of chars said to be on the screen
+	INC SCREEN_CHARS
 
         JMP exit_nmi
 
@@ -170,6 +177,13 @@ reset_cpu:
 	JMP init
 
 backspace:
+	LDA SCREEN_CHARS
+        CMP #0
+        BEQ exit_nmi
+
+	; Since we're moving back, decrement
+	DEC SCREEN_CHARS
+
 	JSR back_and_space
 	JMP exit_nmi
 
