@@ -2,6 +2,10 @@
 .import init
 .import back_and_space
 .import enter_handle
+
+.import KEYBOARD_BUFFER
+.export SCREEN_CHARS
+
 .export _irq_int, _nmi_int
 
 .export PORTB
@@ -164,10 +168,12 @@ print_with_shift:
 	JMP print_key
 	
 print_key:
-        JSR put_c
-
 	; Increment the number of chars said to be on the screen
+	LDX SCREEN_CHARS
+	STA KEYBOARD_BUFFER, X
 	INC SCREEN_CHARS
+
+        JSR put_c
 
         JMP exit_nmi
 
