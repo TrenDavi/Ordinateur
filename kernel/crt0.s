@@ -58,7 +58,7 @@ init:
           JSR lcd_instruction
 
           ; Turn display on, cursor on, blink off
-          LDA #%00001111
+          LDA #%00001110
           JSR lcd_instruction
 
           ; Increment and shift cursor, don't shift display
