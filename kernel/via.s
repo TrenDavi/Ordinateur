@@ -121,6 +121,10 @@ read:
 
         ; Load the final 8 bit code
         LDA DATA
+
+	; Put the scan code onto the LED shift register display
+        LDA DATA
+        STA SR
         
         ; Compare for release code. If so: set the release code flag
         CMP #%00001111 ; 0xF0 as 0x0F
@@ -161,10 +165,6 @@ print_with_shift:
 	
 print_key:
         JSR put_c
-
-	; Put the scan code onto the LED shift register display
-        LDA DATA
-        STA SR
 
 	; Increment the number of chars said to be on the screen
 	INC SCREEN_CHARS
