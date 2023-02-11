@@ -1,6 +1,7 @@
 .import _stop
 .import init
 .import back_and_space
+.import enter_handle
 .export _irq_int, _nmi_int
 
 .export PORTB
@@ -138,6 +139,10 @@ read:
         CMP #%01001000
         BEQ set_shift
 
+	; Compare for enter. If so: jump to the kernel's enter handler
+        CMP #%01011010
+        BEQ enter_handle_j
+
 keypress:
 	; Put the indexed code to the screen
         LDX DATA
@@ -219,6 +224,10 @@ set_shift:
 remove_shift:
 	LDA #0
         STA SHIFT_SET
+	JMP exit_nmi
+
+enter_handle_j:
+	JSR enter_handle
 	JMP exit_nmi
 
 
