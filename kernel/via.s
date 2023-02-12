@@ -1,7 +1,7 @@
 .import _stop
 .import init
 .import back_and_space
-.import enter_handle
+.import key_handle
 
 .import KEYBOARD_BUFFER
 .export SCREEN_CHARS
@@ -68,6 +68,8 @@ SCREEN_CHARS: .byte 0
 ; Keep track if the shift key has been shifted
 SHIFT_SET: .byte 0
 
+.segment "CODE"
+
 _nmi_int:
       	PHA
         PHX
@@ -104,10 +106,6 @@ skip_input:
         JMP inc_exit
 
 read:
-	; Put the scan code onto the LED shift register display
-        LDA DATA
-        STA SR
-
         ; Check if it's a release code or a character code. If it's a
         ; release code, set the release next flag that indicated the next
         ; code shows which key has been released.
@@ -138,18 +136,9 @@ read:
         CMP #%01101110
 	BEQ reset_cpu
 
-	; Compare for backspace. If so: branch to the shift back and
-        ; insert empty space sub routine
-        CMP #%01100110
-	BEQ backspace
-
 	; Compare for shift. If so: set the shift flag to 1
         CMP #%01001000
         BEQ set_shift
-
-	; Compare for enter. If so: jump to the kernel's enter handler
-        CMP #%01011010
-        BEQ enter_handle_j
 
 keypress:
 	; Put the indexed code to the screen
@@ -168,12 +157,14 @@ print_with_shift:
 	JMP print_key
 	
 print_key:
-	; Increment the number of chars said to be on the screen
+	; Increment the number of chars said to be on the screen and
+	; add it to the keyboard buffer
 	LDX SCREEN_CHARS
 	STA KEYBOARD_BUFFER, X
 	INC SCREEN_CHARS
 
-        JSR put_c
+	; Trigger the kernel's keypress handler
+	JSR key_handle_j
 
         JMP exit_nmi
 
@@ -191,6 +182,9 @@ read_release:
 
         ; Load the code into A
         LDA DATA
+
+	; Put the scan code onto the LED shift register display
+        STA SR
 
 	; Compare for shift. If so: set the shift flag to 0
         CMP #%01001000
@@ -211,17 +205,6 @@ exit_nmi:
 reset_cpu:
 	JMP init
 
-backspace:
-	LDA SCREEN_CHARS
-        CMP #0
-        BEQ exit_nmi
-
-	; Since we're moving back, decrement
-	DEC SCREEN_CHARS
-
-	JSR back_and_space
-	JMP exit_nmi
-
 set_shift:
 	LDA #1
         STA SHIFT_SET
@@ -232,9 +215,9 @@ remove_shift:
         STA SHIFT_SET
 	JMP exit_nmi
 
-enter_handle_j:
-	JSR enter_handle
-	JMP exit_nmi
+key_handle_j:
+	JSR key_handle
+	RTS
 
 
 .segment "RODATA"
@@ -277,3 +260,5 @@ keymap_upper:
   .byte "?D???????H?????"
   .byte "L?F???S?}?J????"
   .byte "123456789ABCDEF"
+
+; End of PS/2 driver

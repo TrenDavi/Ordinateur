@@ -1,9 +1,12 @@
 .export back_and_space
+.export backspace
 .export lcd_wait
 .export lcd_busy
 .export lcd_instruction
 
 .export put_c
+
+.import SCREEN_CHARS
 
 .import PORTB
 .import PORTA
@@ -20,9 +23,13 @@
 .export RW
 .export RS
 
+.segment "DATA"
+
 E  = %10000000
 RW = %01000000
 RS = %00100000
+
+.segment "CODE"
 
 lcd_wait:
         PHA
@@ -68,6 +75,17 @@ put_c:
 	STA PORTA
 
 	RTS
+
+backspace:
+        LDA SCREEN_CHARS
+        CMP #0
+        RTS
+
+        ; Since we're moving back, decrement
+        DEC SCREEN_CHARS
+
+        JSR back_and_space
+        RTS
 
 back_and_space:
 	LDA #%00010000
