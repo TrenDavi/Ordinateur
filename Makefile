@@ -12,12 +12,11 @@ files_o =         \
     kernel/lcd.o      \
     
 all: $(files_o)
-	ld65 -C sbc.cfg $^ sbc.lib -o Ordinateur
+	ld65 -C sbc.cfg $^ kernel/supervision.lib -o Ordinateur
 
 crt0.o:
-	cp lib/supervision.lib sbc.lib
 	$(AS) kernel/crt0.s -o crt0.o
-	ar65 a sbc.lib crt0.o
+	ar65 a kernel/supervision.lib crt0.o
 
 # Have every assembly *.s file be assembled by an implicit rule
 %.o: kernel/%.s arch/%.s
@@ -25,5 +24,5 @@ crt0.o:
 
 .PHONY: clean
 clean:
-	rm -rf sbc.lib *.s *.o **/*.o Ordinateur
+	rm -rf *.s *.o **/*.o Ordinateur
 
