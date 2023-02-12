@@ -57,7 +57,7 @@ init:
 	LDA #0
 clear_loop:
 	STA KEYBOARD_BUFFER, X
-	CPX #256
+	CPX #255
 	BEQ exit_clear_loop
 	INX
 	JMP clear_loop

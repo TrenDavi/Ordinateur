@@ -10,6 +10,8 @@
 .import back_and_space
 .import string_cmp
 
+.import SR
+
 ; The enter_handle and key_hand are two special handled that
 ; reroute data from the keyboard into the program that is currently
 ; running. This is a similar idea to application io in that the kernel
@@ -66,8 +68,12 @@ k_supervisor_backspace_handle:
         CMP #0
         BEQ exit_key_handle
 
-	; Since we're moving back, decrement
+	; Since we're moving back
 	DEC SCREEN_CHARS
+	
+	LDA #0
+	LDX SCREEN_CHARS
+	STA KEYBOARD_BUFFER, X
 
 	JSR back_and_space
 	JMP exit_key_handle
@@ -92,8 +98,8 @@ k_supervisor_enter_handle:
 
 	CMP #0
 	BNE no
-	LDA #'y'
-	JSR put_c
+	LDA #%11111111
+	STA SR
 no:
 
 	JMP exit_key_handle
