@@ -13,8 +13,8 @@ Interesting files you may want to see...
 |:-----|:----|:-----|-------------|
 | 0x000 | 0x0FF  | `zp` | Zero Page |
 | 0x100 | 0x1FF  | `stack` | Stack |
-| 0x200 | 0x300  | `key buf` | Keyboard Buffer |
-| 0x301 | 0x5FFF | `ram` | Random Access Memory |
+| 0x200 | 0x5FFF | `ram` | Random Access Memory |
+| 0x1000 | 0x1100  | `key buf` | Keyboard Buffer |
 | 0x6000 | 0x600F | `via` | Base address of 65c22 |
 | | | | |
 | 0xC000 | 0xFFFF | `rom` | Read Only Memory |
