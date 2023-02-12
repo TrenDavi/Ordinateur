@@ -8,6 +8,7 @@
 .import lcd_instruction
 
 .import back_and_space
+.import string_cmp
 
 ; The enter_handle and key_hand are two special handled that
 ; reroute data from the keyboard into the program that is currently
@@ -68,25 +69,21 @@ k_supervisor_enter_handle:
 	; Compare the keyboard buffer with all the programs
 	; and commands the computer has. The result will be stored
 	; in A
-	JSR compare_commands
-	JMP exit_key_handle
+	LDA #>KEYBOARD_BUFFER
+	STA $01
+	LDA #<KEYBOARD_BUFFER
+	STA $00
 
-compare_commands:
-	LDX #0
-start_list:
-	LDA KEYBOARD_BUFFER, X
-	CMP list, X
-	BNE not_list
-	CPX SCREEN_CHARS
-	BEQ is_list
-	INX
-	JMP start_list
-is_list:
-	LDA #'l'
-	JSR put_c
-	RTS
-not_list:
-	RTS
+	; load the address of list and its length, then compare
+	LDA #>list
+	STA $03
+	LDA #<list
+	STA $02
+	LDA #4 ; Length of 'list'
+	STA $04
+	JSR string_cmp
+
+	JMP exit_key_handle
 
 exit_key_handle:
 	RTS

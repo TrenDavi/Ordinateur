@@ -10,7 +10,7 @@ files_o =         \
     kernel/wait.o        \
     kernel/kernel.o    \
     kernel/lcd.o      \
-    kernel/scancode.o      \
+    kernel/string.o      \
     
 all: $(files_o)
 	ld65 -C sbc.cfg $^ sbc.lib -o Ordinateur

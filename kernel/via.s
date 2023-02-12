@@ -73,6 +73,7 @@ SHIFT_SET: .byte 0
 _nmi_int:
       	PHA
         PHX
+        PHY
 
         ; Read in the data from bit 0 of PORTA on the 65C22 VIA
         ; load it to NEW_BIT
@@ -207,6 +208,7 @@ inc_exit:
 exit_nmi:
 	PLA
         PLX
+        PLY
         RTI
 
 reset_cpu:
