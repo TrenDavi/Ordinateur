@@ -1,10 +1,10 @@
 .export back_and_space
-.export backspace
 .export lcd_wait
 .export lcd_busy
 .export lcd_instruction
 
 .export put_c
+.export back_and_space
 
 .import SCREEN_CHARS
 
@@ -75,17 +75,6 @@ put_c:
 	STA PORTA
 
 	RTS
-
-backspace:
-        LDA SCREEN_CHARS
-        CMP #0
-        RTS
-
-        ; Since we're moving back, decrement
-        DEC SCREEN_CHARS
-
-        JSR back_and_space
-        RTS
 
 back_and_space:
 	LDA #%00010000

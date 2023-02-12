@@ -140,6 +140,14 @@ read:
         CMP #%01001000
         BEQ set_shift
 
+	; Compare for backspace. If so: branch to the key handler
+        CMP #%01100110
+	BEQ special_to_keyhandle
+
+	; Compare for enter. If so: jump to the kernel's enter handler
+        CMP #%01011010
+	BEQ special_to_keyhandle
+
 keypress:
 	; Put the indexed code to the screen
         LDX DATA
@@ -165,8 +173,7 @@ print_key:
 
 	; Trigger the kernel's keypress handler
 	JSR key_handle_j
-
-        JMP exit_nmi
+	JMP exit_nmi
 
 release:
         ; Set the release flag, indicating that the next byte to be read in
@@ -218,6 +225,10 @@ remove_shift:
 key_handle_j:
 	JSR key_handle
 	RTS
+
+special_to_keyhandle:
+	JSR key_handle
+	JMP exit_nmi
 
 
 .segment "RODATA"
