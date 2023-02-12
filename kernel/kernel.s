@@ -7,20 +7,9 @@
 .import put_c
 .import lcd_instruction
 
-KEYBOARD_BUFFER = $3000
+KEYBOARD_BUFFER = $1000
 
 enter_handle:
-	LDX #0
-loop:
-	LDA KEYBOARD_BUFFER, X
-	JSR put_c
-	INX
-	CPX SCREEN_CHARS
-	BEQ done
-        JMP loop
-done:
-	LDA #0
-        STA SCREEN_CHARS
 	RTS
 
 
