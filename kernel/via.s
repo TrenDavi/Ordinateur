@@ -132,10 +132,6 @@ read:
         CMP #%00001111 ; 0xF0 as 0x0F
         BEQ release
 
-        ; Compare for escape. If so: reset the processor
-        CMP #%01101110
-	BEQ reset_cpu
-
 	; Compare for shift. If so: set the shift flag to 1
         CMP #%01001000
         BEQ set_shift
@@ -189,6 +185,10 @@ read_release:
 
         ; Load the code into A
         LDA DATA
+
+        ; Compare for escape. If so: reset the processor
+        CMP #%01101110
+	BEQ reset_cpu
 
 	; Put the scan code onto the LED shift register display
         STA SR
