@@ -104,6 +104,10 @@ skip_input:
         JMP inc_exit
 
 read:
+	; Put the scan code onto the LED shift register display
+        LDA DATA
+        STA SR
+
         ; Check if it's a release code or a character code. If it's a
         ; release code, set the release next flag that indicated the next
         ; code shows which key has been released.
@@ -125,10 +129,6 @@ read:
 
         ; Load the final 8 bit code
         LDA DATA
-
-	; Put the scan code onto the LED shift register display
-        LDA DATA
-        STA SR
         
         ; Compare for release code. If so: set the release code flag
         CMP #%00001111 ; 0xF0 as 0x0F
