@@ -37,20 +37,56 @@ key_handle:
 	LDA SUPERVISOR
 	CMP #0
 	BEQ k_supervisor_key_handle
+
 	RTS
 k_supervisor_key_handle:
 	TXA
 	; Backspace
 	CMP #%01100110
-	BEQ backspace_handle
+	BEQ k_supervisor_backspace_handle
 
 	; Enter
 	CMP #%01011010
-	BEQ enter_handle
+	BEQ k_supervisor_enter_handle
 
 	; Any other keypress
 	JSR put_c
 	JMP exit_key_handle
+
+k_supervisor_backspace_handle:
+	LDA SCREEN_CHARS
+        CMP #0
+        BEQ exit_key_handle
+
+	; Since we're moving back, decrement
+	DEC SCREEN_CHARS
+
+	JSR back_and_space
+	JMP exit_key_handle
+
+k_supervisor_enter_handle:
+	; Compare the keyboard buffer with all the programs
+	; and commands the computer has. The result will be stored
+	; in A
+	JSR compare_commands
+	JMP exit_key_handle
+
+compare_commands:
+	LDX #0
+start_list:
+	LDA KEYBOARD_BUFFER, X
+	CMP list, X
+	BNE not_list
+	CPX SCREEN_CHARS
+	BEQ is_list
+	INX
+	JMP start_list
+is_list:
+	LDA #'l'
+	JSR put_c
+	RTS
+not_list:
+	RTS
 
 exit_key_handle:
 	RTS
@@ -79,16 +115,6 @@ kernel:
 waitloop:
 	JMP waitloop
 
-backspace_handle:
-	LDA SCREEN_CHARS
-        CMP #0
-        BEQ exit_key_handle
-
-	; Since we're moving back, decrement
-	DEC SCREEN_CHARS
-
-	JSR back_and_space
-	JMP exit_key_handle
-
-enter_handle:
-	JMP exit_key_handle
+.segment "RODATA"
+; command 1
+list: .asciiz "list"
