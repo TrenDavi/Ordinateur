@@ -162,12 +162,6 @@ print_with_shift:
 	JMP print_key
 	
 print_key:
-	; Increment the number of chars said to be on the screen and
-	; add it to the keyboard buffer
-	LDX SCREEN_CHARS
-	STA KEYBOARD_BUFFER, X
-	INC SCREEN_CHARS
-
 	; Trigger the kernel's keypress handler
 	JSR key_handle_j
 	JMP exit_nmi

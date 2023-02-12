@@ -51,6 +51,13 @@ k_supervisor_key_handle:
 	BEQ k_supervisor_enter_handle
 
 	; Any other keypress
+
+        ; Increment the number of chars said to be on the screen and
+        ; add it to the keyboard buffer
+        LDX SCREEN_CHARS
+        STA KEYBOARD_BUFFER, X
+        INC SCREEN_CHARS
+
 	JSR put_c
 	JMP exit_key_handle
 
@@ -82,6 +89,12 @@ k_supervisor_enter_handle:
 	LDA #4 ; Length of 'list'
 	STA $04
 	JSR string_cmp
+
+	CMP #0
+	BNE no
+	LDA #'y'
+	JSR put_c
+no:
 
 	JMP exit_key_handle
 
