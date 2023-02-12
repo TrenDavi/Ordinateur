@@ -36,9 +36,9 @@ key_handle:
 	; Compare for kernel SuperVisior
 	LDA SUPERVISOR
 	CMP #0
-	BEQ k_supervisor
+	BEQ k_supervisor_key_handle
 	RTS
-k_supervisor:
+k_supervisor_key_handle:
 	TXA
 	; Backspace
 	CMP #%01100110
