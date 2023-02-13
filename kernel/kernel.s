@@ -53,12 +53,16 @@ k_supervisor_key_handle:
 	BEQ k_supervisor_enter_handle
 
 	; Any other keypress
+	LDX SCREEN_CHARS
+	CPX #14
+	BEQ exit_key_handle
 
         ; Increment the number of chars said to be on the screen and
         ; add it to the keyboard buffer
         LDX SCREEN_CHARS
         STA KEYBOARD_BUFFER, X
         INC SCREEN_CHARS
+
 
 	JSR put_c
 	JMP exit_key_handle
