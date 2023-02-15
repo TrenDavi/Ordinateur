@@ -1,12 +1,8 @@
-.export back_and_space
 .export lcd_wait
 .export lcd_busy
 .export lcd_instruction
 
 .export put_c
-.export back_and_space
-
-.import SCREEN_CHARS
 
 .import PORTB
 .import PORTA
@@ -74,21 +70,4 @@ put_c:
         LDA #RS         ; Clear E bits
 	STA PORTA
 
-	RTS
-
-back_and_space:
-	LDA #%00010000
-	JSR lcd_instruction
-
-	LDA #%00000100
-	JSR lcd_instruction
-
-	LDA #' '
-	JSR put_c
-
-	LDA #%00010100
-	JSR lcd_instruction
-
-	LDA #%00000110
-	JSR lcd_instruction
 	RTS

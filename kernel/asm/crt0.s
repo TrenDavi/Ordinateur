@@ -23,9 +23,6 @@
 
 .import lcd_instruction
 
-.import SCREEN_CHARS
-.import KEYBOARD_BUFFER
-
 .import   kinit
 
 .include  "zeropage.inc"
@@ -48,21 +45,6 @@ init:
         JSR     zerobss              ; Clear BSS segment
         JSR     copydata             ; Initialize DATA segment
         JSR     initlib              ; Run constructors
-
-; Reset keyboard buffer
-	LDA #0
-	STA SCREEN_CHARS
-
-	LDX #0
-	LDA #0
-clear_loop:
-	STA KEYBOARD_BUFFER, X
-	CPX #255
-	BEQ exit_clear_loop
-	INX
-	JMP clear_loop
-exit_clear_loop:
-	
 
 ; Initialize screen
         LDA #%11111111

@@ -1,10 +1,6 @@
 .import _stop
 .import init
-.import back_and_space
 .import key_handle
-
-.import KEYBOARD_BUFFER
-.export SCREEN_CHARS
 
 .export _irq_int, _nmi_int
 
@@ -184,9 +180,6 @@ read_release:
         ; Compare for escape. If so: reset the processor
         CMP #%01101110
 	BEQ reset_cpu
-
-	; Put the scan code onto the LED shift register display
-        STA SR
 
 	; Compare for shift. If so: set the shift flag to 0
         CMP #%01001000
