@@ -61,6 +61,7 @@ lcd_instruction:
         RTS
 
 put_c:
+	PHA
         JSR lcd_wait
         STA PORTB
         LDA #RS         ; Set RS; Clear RW/E bits
@@ -69,5 +70,6 @@ put_c:
         STA PORTA
         LDA #RS         ; Clear E bits
 	STA PORTA
+	PLA
 
 	RTS

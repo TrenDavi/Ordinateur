@@ -1,8 +1,11 @@
 .import _stop
 .import init
-.import key_handle
+.import _key_handler
+
+.importzp sp
 
 .export _irq_int, _nmi_int
+.export key_ret
 
 .export PORTB
 .export PORTA
@@ -135,11 +138,11 @@ read:
 
 	; Compare for backspace. If so: branch to the key handler
         CMP #%01100110
-	BEQ special_to_keyhandle
+	BEQ key_handle_j
 
 	; Compare for enter. If so: jump to the kernel's enter handler
         CMP #%01011010
-	BEQ special_to_keyhandle
+	BEQ key_handle_j
 
 keypress:
 	; Put the indexed code to the screen
@@ -159,8 +162,8 @@ print_with_shift:
 	
 print_key:
 	; Trigger the kernel's keypress handler
-	JSR key_handle_j
-	JMP exit_nmi
+	JMP key_handle_j
+
 
 release:
         ; Set the release flag, indicating that the next byte to be read in
@@ -212,13 +215,10 @@ remove_shift:
 	JMP exit_nmi
 
 key_handle_j:
-	JSR key_handle
-	RTS
-
-special_to_keyhandle:
-	JSR key_handle
+	JMP ($30)
+key_ret:
 	JMP exit_nmi
-
+	
 
 .segment "RODATA"
 
