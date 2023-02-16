@@ -1,7 +1,7 @@
 AS = ca65
 ASFLAGS = --cpu 65c02 -I include
 CC = cc65
-CFLAGS = -t none --cpu 65c02 -I include
+CFLAGS = -g -t none --cpu 65c02 -I include
 
 OBJDIR = build
 SRCDIR = kernel
@@ -17,12 +17,11 @@ all: Ordinateur
 $(OBJDIR)/%.o: $(SRCDIR)/asm/%.s | $(OBJDIR)
 	$(AS) $(ASFLAGS) -o $@ $<
 
-$(OBJDIR)/asm/%.s: $(SRCDIR)/%.c | $(OBJDIR)
+$(OBJDIR)/%.s: $(SRCDIR)/%.c | $(OBJDIR)
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(OBJDIR):
 	mkdir $(OBJDIR)
-	mkdir $(OBJDIR)/asm
 
 Ordinateur: $(ASMOBJ) $(COBJ) sbc.lib
 	ld65 -C sbc.cfg $^ sbc.lib -o $@
