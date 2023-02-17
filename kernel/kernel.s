@@ -10,7 +10,7 @@
 .import back_and_space
 .import string_cmp
 
-.import SR
+.import program_list
 
 ; The enter_handle and key_hand are two special handled that
 ; reroute data from the keyboard into the program that is currently
@@ -101,10 +101,10 @@ k_supervisor_enter_handle:
 	JSR string_cmp
 
 	CMP #0
-	BNE no
-	LDA #%11111111
-	STA SR
-no:
+	BNE not_list
+	JMP program_list
+	
+not_list:
 
 	JMP exit_key_handle
 
