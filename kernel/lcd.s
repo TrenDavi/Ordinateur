@@ -77,6 +77,7 @@ put_c:
 	RTS
 
 back_and_space:
+	PHA
 	LDA #%00010000
 	JSR lcd_instruction
 
@@ -91,4 +92,5 @@ back_and_space:
 
 	LDA #%00000110
 	JSR lcd_instruction
+	PLA
 	RTS

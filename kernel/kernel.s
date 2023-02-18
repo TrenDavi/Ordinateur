@@ -2,6 +2,16 @@
 .export key_handle
 .export KEYBOARD_BUFFER
 
+.import list_program_key_handle
+
+.import init
+
+.import T1CH
+.import T1LL
+.import T1LH
+.import SR
+.export wait
+
 .import SCREEN_CHARS
 
 .import put_c
@@ -11,6 +21,43 @@
 .import string_cmp
 
 .import program_list
+
+.segment "DATA"
+
+EXTENDED1: .byte 0
+END_VAL: .byte 0
+
+.segment "CODE"
+
+wait:
+	PHX
+	PHY
+
+	STA END_VAL
+	LDA #0
+	STA EXTENDED1
+	LDY #0
+wait_loop:
+	LDX #0
+time_l:
+	INX
+	CPX #255
+	BNE time_l
+	INY
+	CPY #5
+	BNE wait_loop
+	INC EXTENDED1
+	LDA EXTENDED1
+	CMP END_VAL
+	BEQ end_wait
+	JMP wait_loop
+	
+
+end_wait:
+	PLY
+	PLX
+	RTS
+
 
 ; The enter_handle and key_hand are two special handled that
 ; reroute data from the keyboard into the program that is currently
@@ -40,8 +87,12 @@ key_handle:
 	LDA SUPERVISOR
 	CMP #0
 	BEQ k_supervisor_key_handle
+	CMP #1
+	BEQ list_program_handle_j
 
-	RTS
+return_to_key_handle:
+	JMP exit_key_handle
+
 k_supervisor_key_handle:
 	TXA
 	; Backspace
@@ -62,7 +113,6 @@ k_supervisor_key_handle:
         LDX SCREEN_CHARS
         STA KEYBOARD_BUFFER, X
         INC SCREEN_CHARS
-
 
 	JSR put_c
 	JMP exit_key_handle
@@ -102,38 +152,48 @@ k_supervisor_enter_handle:
 
 	CMP #0
 	BNE not_list
-	JMP program_list
+	LDA #1
+	STA SUPERVISOR
 	
 not_list:
-
 	JMP exit_key_handle
+
+list_program_handle_j:
+	JSR list_program_key_handle
+	JMP return_to_key_handle
 
 exit_key_handle:
 	RTS
 
 kinit:
+	CLI
+
 	; Set the SuperVisor state to kernel since we're going into kernel
 	; terminal mode for the user to input a command, first.
+kernel:
+	LDA #%00000001
+	JSR lcd_instruction
 	LDA #0
 	STA SUPERVISOR
-
-	; Jump to the kernel
-	JSR kernel
-	JMP waitloop
-
-kernel:
-	; Clear the screen
-	LDA #%000000001
-	JSR lcd_instruction
+	STA SR
 
 	; Print a prompt character to the screen
 	LDA #'>'
 	JSR put_c
 
-	RTS
-
 waitloop:
+	LDA SUPERVISOR
+	CMP #0
+	BEQ waitloop
+	CMP #1
+	BEQ list_program_run
 	JMP waitloop
+
+list_program_run:
+	JSR program_list
+	LDA #0
+	STA SUPERVISOR
+	JMP init
 
 .segment "RODATA"
 ; command 1

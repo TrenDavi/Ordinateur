@@ -3,6 +3,7 @@
 .segment "CODE"
 
 string_cmp:
+	PHY
         LDY #0
 compare_loop:
         LDA ($00), Y
@@ -15,8 +16,10 @@ compare_loop:
 
 exit_compare_with_success:
         LDA #0
+	PLY
         RTS
 
 exit_compare_with_fail:
         LDA #1
+	PLY
         RTS

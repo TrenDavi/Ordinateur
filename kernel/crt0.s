@@ -82,18 +82,18 @@ exit_clear_loop:
         LDA #%00000110
         JSR lcd_instruction
 
-        ; Clear display
-        LDA #%00000001
-        JSR lcd_instruction
-
-; Set and Clear shift register at SR 0x6000
+; Initialize the 65C22
         LDA #%00011000
         STA ACR
 
+; IRQ Enable, timer
+	LDA #%11000000
+	STA IER
+
+; Set and Clear shift register at SR 0x6000
         LDA #%00000000
         STA SR
 
-        CLI
         JSR kinit
 
 exit:    

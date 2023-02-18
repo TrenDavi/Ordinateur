@@ -19,6 +19,10 @@
 .export IFR
 .export IER
 
+.export T1CH
+.export T1LL
+.export T1LH
+
 PORTB = $6000
 PORTA = $6001
 DDRB = $6002
@@ -30,13 +34,17 @@ PCR = $600C
 IFR = $600D
 IER = $600E
 
+T1CH = $6005
+T1LL = $6006
+T1LH = $6007
+
 .import put_c
 .import lcd_instruction
 
-
-.segment  "CODE"
-
 .PC02
+
+; IRQ interrupt, currently servicing only the timer (T1)
+.segment  "CODE"
 
 _irq_int:
       	RTI
@@ -197,9 +205,9 @@ inc_exit:
         JMP exit_nmi
 
 exit_nmi:
-	PLA
-        PLX
         PLY
+        PLX
+	PLA
         RTI
 
 reset_cpu:
