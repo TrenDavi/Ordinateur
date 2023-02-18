@@ -19,6 +19,7 @@
 
 .import back_and_space
 .import string_cmp
+.import prints
 
 .import program_list
 
@@ -93,6 +94,13 @@ key_handle:
 return_to_key_handle:
 	JMP exit_key_handle
 
+exit_key_handle:
+	RTS
+
+list_program_handle_j:
+	JSR list_program_key_handle
+	JMP return_to_key_handle
+
 k_supervisor_key_handle:
 	TXA
 	; Backspace
@@ -133,6 +141,10 @@ k_supervisor_backspace_handle:
 	JMP exit_key_handle
 
 k_supervisor_enter_handle:
+	LDA SCREEN_CHARS
+	CMP #0
+	BEQ exit_key_handle
+
 	; Compare the keyboard buffer with all the programs
 	; and commands the computer has. The result will be stored
 	; in A
@@ -154,16 +166,46 @@ k_supervisor_enter_handle:
 	BNE not_list
 	LDA #1
 	STA SUPERVISOR
-	
-not_list:
+
 	JMP exit_key_handle
+not_list:
+	LDA #%00000001
+	JSR lcd_instruction
 
-list_program_handle_j:
-	JSR list_program_key_handle
-	JMP return_to_key_handle
+	LDA #>not_found1
+	STA $01
+	LDA #<not_found1
+	STA $00
+	LDA #7
+	JSR prints
 
-exit_key_handle:
-	RTS
+	LDA #%11000000
+	JSR lcd_instruction
+
+	LDA #>KEYBOARD_BUFFER
+	STA $01
+	LDA #<KEYBOARD_BUFFER
+	STA $00
+	LDA SCREEN_CHARS
+	JSR prints
+
+	LDA #%00000100
+	JSR wait
+	
+	LDA #%00000001
+	JSR lcd_instruction
+
+	LDA #>not_found2
+	STA $01
+	LDA #<not_found2
+	STA $00
+	LDA #9
+	JSR prints
+
+	LDA #%00000011
+	JSR wait
+	
+	JMP init
 
 kinit:
 	CLI
@@ -198,3 +240,5 @@ list_program_run:
 .segment "RODATA"
 ; command 1
 list: .asciiz "list"
+not_found1: .asciiz "Command"
+not_found2: .asciiz "Not found"

@@ -1,4 +1,7 @@
 .export string_cmp
+.export prints
+
+.import put_c
 
 .segment "CODE"
 
@@ -23,3 +26,24 @@ exit_compare_with_fail:
         LDA #1
 	PLY
         RTS
+
+.segment "DATA"
+TEMP_LEN: .byte 0
+
+.segment "CODE"
+
+prints:
+	PHY
+
+	STA TEMP_LEN
+	LDY #0
+ploop:
+        LDA ($00), Y
+	CPY TEMP_LEN
+	BEQ pexit
+	JSR put_c
+	INY
+	JMP ploop
+pexit:
+	PLY
+	RTS
