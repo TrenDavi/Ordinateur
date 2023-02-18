@@ -1,8 +1,13 @@
 .import init
 .import lcd_instruction
 .import put_c
+.import prints
 .import wait
+
 .import SR
+
+.import list
+.import dino
 
 .export program_list
 .export list_program_key_handle
@@ -16,13 +21,40 @@ program_list:
 	LDA #%00000001
 	JSR lcd_instruction
 	
-	LDA #%00000111
+	LDA #'1'
+	JSR put_c
+	LDA #'.'
+	JSR put_c
+	LDA #' '
+	JSR put_c
+
+        LDA #>dino
+        STA $01
+        LDA #<dino
+        STA $00
+        LDA #4
+        JSR prints
+	
+	LDA #%00000011
 	JSR wait
 
-	LDA #%11111111
-	STA SR
+	LDA #%00000001
+	JSR lcd_instruction
 
-	; wait for one second
+	LDA #'2'
+	JSR put_c
+	LDA #'.'
+	JSR put_c
+	LDA #' '
+	JSR put_c
+
+        LDA #>list
+        STA $01
+        LDA #<list
+        STA $00
+        LDA #4
+        JSR prints
+
 	LDA #%00000011
 	JSR wait
 

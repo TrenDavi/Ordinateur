@@ -2,7 +2,11 @@
 .export key_handle
 .export KEYBOARD_BUFFER
 
+.export list
+.export dino
+
 .import list_program_key_handle
+.import dino_program_key_handle
 
 .import init
 
@@ -22,6 +26,7 @@
 .import prints
 
 .import program_list
+.import program_dino
 
 .segment "DATA"
 
@@ -83,13 +88,14 @@ KEYBOARD_BUFFER = $1000
 .segment "CODE"
 
 key_handle:
-	TAX
 	; Compare for kernel SuperVisior
-	LDA SUPERVISOR
-	CMP #0
+	LDX SUPERVISOR
+	CPX #0
 	BEQ k_supervisor_key_handle
-	CMP #1
+	CPX #1
 	BEQ list_program_handle_j
+	CPX #2
+	BEQ dino_program_handle_j
 
 return_to_key_handle:
 	JMP exit_key_handle
@@ -101,8 +107,11 @@ list_program_handle_j:
 	JSR list_program_key_handle
 	JMP return_to_key_handle
 
+dino_program_handle_j:
+	JSR dino_program_key_handle
+	JMP return_to_key_handle
+
 k_supervisor_key_handle:
-	TXA
 	; Backspace
 	CMP #%01100110
 	BEQ k_supervisor_backspace_handle
@@ -163,12 +172,32 @@ k_supervisor_enter_handle:
 	JSR string_cmp
 
 	CMP #0
-	BNE not_list
+	BNE next
 	LDA #1
 	STA SUPERVISOR
+	JMP exit_key_handle
+
+next:
+
+	; load the address of dino and its length, then compare
+	LDA #>dino
+	STA $03
+	LDA #<dino
+	STA $02
+	LDA #4 ; Length of 'dino'
+	STA $04
+	JSR string_cmp
+
+	CMP #0
+	BNE next1
+	LDA #2
+	STA SUPERVISOR
+	JMP exit_key_handle
+
+next1:
 
 	JMP exit_key_handle
-not_list:
+not_found:
 	LDA #%00000001
 	JSR lcd_instruction
 
@@ -229,6 +258,8 @@ waitloop:
 	BEQ waitloop
 	CMP #1
 	BEQ list_program_run
+	CMP #2
+	BEQ dino_program_run
 	JMP waitloop
 
 list_program_run:
@@ -237,8 +268,18 @@ list_program_run:
 	STA SUPERVISOR
 	JMP init
 
+dino_program_run:
+	JSR program_dino
+	LDA #0
+	STA SUPERVISOR
+	JMP init
+
 .segment "RODATA"
 ; command 1
 list: .asciiz "list"
+; command 2
+dino: .asciiz "dino"
+
+; error message
 not_found1: .asciiz "Command"
 not_found2: .asciiz "Not found"

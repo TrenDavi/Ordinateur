@@ -12,10 +12,10 @@ files_o =         		\
     kernel/lcd.o      		\
     kernel/string.o      	\
     kernel/programs/list.o      \
+    kernel/programs/dino.o      \
     
 all: $(files_o)
 	ld65 -C sbc.cfg $^ sbc.lib -o Ordinateur
-	rm -rf sbc.lib *.o kernel/programs/*.o kernel/*.o
 
 crt0.o:
 	cp kernel/supervision.lib sbc.lib
