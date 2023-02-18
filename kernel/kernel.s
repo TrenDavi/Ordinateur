@@ -196,7 +196,6 @@ next:
 
 next1:
 
-	JMP exit_key_handle
 not_found:
 	LDA #%00000001
 	JSR lcd_instruction
