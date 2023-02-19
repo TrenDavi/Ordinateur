@@ -8,6 +8,7 @@
 
 .import list
 .import dino
+.import help
 
 .export program_list
 .export list_program_key_handle
@@ -51,6 +52,26 @@ program_list:
         LDA #>list
         STA $01
         LDA #<list
+        STA $00
+        LDA #4
+        JSR prints
+
+	LDA #%00000011
+	JSR wait
+
+	LDA #%00000001
+	JSR lcd_instruction
+
+	LDA #'3'
+	JSR put_c
+	LDA #'.'
+	JSR put_c
+	LDA #' '
+	JSR put_c
+
+        LDA #>help
+        STA $01
+        LDA #<help
         STA $00
         LDA #4
         JSR prints

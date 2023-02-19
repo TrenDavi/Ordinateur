@@ -4,6 +4,7 @@
 
 .export list
 .export dino
+.export help
 
 .import list_program_key_handle
 .import dino_program_key_handle
@@ -27,6 +28,7 @@
 
 .import program_list
 .import program_dino
+.import program_help
 
 .segment "DATA"
 
@@ -196,6 +198,23 @@ next:
 
 next1:
 
+	; load the address of help and its length, then compare
+	LDA #>help
+	STA $03
+	LDA #<help
+	STA $02
+	LDA #4 ; Length of 'help'
+	STA $04
+	JSR string_cmp
+
+	CMP #0
+	BNE next2
+	LDA #3
+	STA SUPERVISOR
+	JMP exit_key_handle
+
+next2:
+
 not_found:
 	LDA #%00000001
 	JSR lcd_instruction
@@ -230,6 +249,19 @@ not_found:
 	LDA #9
 	JSR prints
 
+	LDA #%00000100
+	JSR wait
+	
+	LDA #%00000001
+	JSR lcd_instruction
+
+	LDA #>not_found3
+	STA $01
+	LDA #<not_found3
+	STA $00
+	LDA #10
+	JSR prints
+
 	LDA #%00000011
 	JSR wait
 	
@@ -259,6 +291,8 @@ waitloop:
 	BEQ list_program_run
 	CMP #2
 	BEQ dino_program_run
+	CMP #3
+	BEQ help_program_run
 	JMP waitloop
 
 list_program_run:
@@ -273,12 +307,21 @@ dino_program_run:
 	STA SUPERVISOR
 	JMP init
 
+help_program_run:
+	JSR program_help
+	LDA #0
+	STA SUPERVISOR
+	JMP init
+
 .segment "RODATA"
 ; command 1
 list: .asciiz "list"
 ; command 2
 dino: .asciiz "dino"
+; command 3
+help: .asciiz "help"
 
 ; error message
 not_found1: .asciiz "Command"
 not_found2: .asciiz "Not found"
+not_found3: .asciiz "Use 'help'"

@@ -13,6 +13,7 @@ files_o =         		\
     kernel/string.o      	\
     kernel/programs/list.o      \
     kernel/programs/dino.o      \
+    kernel/programs/help.o      \
     
 all: $(files_o)
 	ld65 -C sbc.cfg $^ sbc.lib -o Ordinateur
