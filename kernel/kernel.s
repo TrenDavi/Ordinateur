@@ -1,6 +1,8 @@
 .export kinit
 .export key_handle
 .export KEYBOARD_BUFFER
+.export COMMAND_BUFFER
+.export HISTORY_COUNTER
 
 .export list
 .export dino
@@ -82,10 +84,12 @@ end_wait:
 ; functionality passed to the program. The kernel will still handle interrupts
 ; such as getting data from the keyboard or IO messaging.
 SUPERVISOR: .byte 0
+HISTORY_COUNTER: .byte 0
 ; Address of the 0x100 long keyboard buffer. This buffer along with
 ; SCREEN_CHARS, which keeps a pointer on the last character put into the
 ; buffer, hold that data that has recently been entered.
-KEYBOARD_BUFFER = $1000
+KEYBOARD_BUFFER = $1000 ; 0xFF
+COMMAND_BUFFER = $1100  ; 0x08
 
 .segment "CODE"
 
@@ -113,7 +117,15 @@ dino_program_handle_j:
 	JSR dino_program_key_handle
 	JMP return_to_key_handle
 
+k_supervisor_down_handle:
+	LDA HISTORY_COUNTER
+	CMP #0
+	BEQ exit_key_handle
+
+	JMP exit_key_handle1
+
 k_supervisor_key_handle:
+	STA SR
 	; Backspace
 	CMP #%01100110
 	BEQ k_supervisor_backspace_handle
@@ -121,6 +133,14 @@ k_supervisor_key_handle:
 	; Enter
 	CMP #%01011010
 	BEQ k_supervisor_enter_handle
+
+	; Up
+	CMP #%10101110
+	BEQ k_supervisor_up_handle
+
+	; Down
+	CMP #%01001110
+	BEQ k_supervisor_down_handle
 
 	; Any other keypress
 	LDX SCREEN_CHARS
@@ -178,6 +198,80 @@ k_supervisor_enter_handle:
 	LDA #1
 	STA SUPERVISOR
 	JMP exit_key_handle
+
+k_supervisor_up_handle:
+	LDA HISTORY_COUNTER
+	CMP #8
+	BEQ exit_key_handle1
+
+        LDX #0
+clear_loop1:
+        STA KEYBOARD_BUFFER, X
+        CPX #255
+        BEQ exit_clear_loop1
+        INX
+        JMP clear_loop1
+exit_clear_loop1:
+	LDA #%00000001
+	JSR lcd_instruction
+
+	LDX HISTORY_COUNTER
+	LDA COMMAND_BUFFER, X
+	CMP #0
+	BEQ exit_key_handle1
+	INX
+	STX HISTORY_COUNTER
+
+	CMP #1
+	BNE next_command
+        LDA #>list
+        STA $01
+        LDA #<list
+        STA $00
+        LDA #4
+        JSR prints
+
+	LDA #5
+	STA SCREEN_CHARS
+
+	JMP exit_key_handle
+next_command:
+	CMP #2
+	BNE next_command1
+        LDA #>dino
+        STA $01
+        LDA #<dino
+        STA $00
+        LDA #4
+        JSR prints
+
+	LDA #5
+	STA SCREEN_CHARS
+
+	JMP exit_key_handle
+next_command1:
+	CMP #3
+	BNE next_command2
+        LDA #>help
+        STA $01
+        LDA #<help
+        STA $00
+        LDA #4
+        JSR prints
+	
+	LDA #5
+	STA SCREEN_CHARS
+
+	JMP exit_key_handle
+next_command2:
+	
+	
+
+	JMP exit_key_handle1
+
+exit_key_handle1:
+	RTS
+
 
 next:
 
@@ -295,7 +389,22 @@ waitloop:
 	BEQ help_program_run
 	JMP waitloop
 
+store_program_history:
+	LDX #6
+store_loop:
+	LDA COMMAND_BUFFER, X
+	INX
+	STA COMMAND_BUFFER, X
+	DEX
+	DEX
+	CPX #0
+	BNE store_loop
+	LDA SUPERVISOR
+	STA COMMAND_BUFFER
+	RTS
+
 list_program_run:
+	JSR store_program_history
 	JSR program_list
 	LDA #0
 	STA SUPERVISOR
@@ -303,12 +412,14 @@ list_program_run:
 
 dino_program_run:
 	JSR program_dino
+	JSR store_program_history
 	LDA #0
 	STA SUPERVISOR
 	JMP init
 
 help_program_run:
 	JSR program_help
+	JSR store_program_history
 	LDA #0
 	STA SUPERVISOR
 	JMP init

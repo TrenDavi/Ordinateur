@@ -25,6 +25,8 @@
 
 .import SCREEN_CHARS
 .import KEYBOARD_BUFFER
+.import COMMAND_BUFFER
+.import HISTORY_COUNTER
 
 .import   kinit
 
@@ -52,9 +54,9 @@ init:
 ; Reset keyboard buffer
 	LDA #0
 	STA SCREEN_CHARS
+	STA HISTORY_COUNTER
 
 	LDX #0
-	LDA #0
 clear_loop:
 	STA KEYBOARD_BUFFER, X
 	CPX #255
@@ -62,6 +64,15 @@ clear_loop:
 	INX
 	JMP clear_loop
 exit_clear_loop:
+	LDX #0
+	LDA #0
+clear_loop1:
+	STA COMMAND_BUFFER, X
+	CPX #7
+	BEQ exit_clear_loop1
+	INX
+	JMP clear_loop1
+exit_clear_loop1:
 	
 
 ; Initialize screen

@@ -156,6 +156,7 @@ read:
 keypress:
 	; Put the indexed code to the screen
         LDX DATA
+	STX SR
 	
 	LDA SHIFT_SET
 	CMP #0
